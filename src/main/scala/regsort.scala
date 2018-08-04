@@ -11,13 +11,14 @@ object RegSort {
       .config("es.index.auto.create", "true")
       .getOrCreate()
 
-    val RDD = spark.sparkContext.esRDD("artists_and_products/_doc")
+    val artistAndProducts = spark.sparkContext.esRDD("artists_and_products/_doc")
 
     // val logData = spark.read.textFile(logFile).cache()
     // val numAs = logData.filter(line => line.contains("a")).count()
     // val numBs = logData.filter(line => line.contains("b")).count()
 
-    val numAs = 9999
+    val numAs = artistAndProducts.count()
+    
     val numBs = 7777
 
     println(s"Lines with a: $numAs, Lines with b: $numBs")
