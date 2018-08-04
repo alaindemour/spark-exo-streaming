@@ -1,7 +1,4 @@
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.SparkContext    
-import org.apache.spark.SparkContext._
-import org.apache.spark.SparkConf
 import org.elasticsearch.spark._ 
 
 object RegSort {  
@@ -14,6 +11,7 @@ object RegSort {
       .config("es.index.auto.create", "true")
       .getOrCreate()
 
+    val RDD = spark.sparkContext.esRDD("artists_and_products/_doc")
 
     // val logData = spark.read.textFile(logFile).cache()
     // val numAs = logData.filter(line => line.contains("a")).count()
