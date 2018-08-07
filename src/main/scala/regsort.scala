@@ -1,5 +1,7 @@
 import org.apache.spark.sql.SparkSession
 import org.elasticsearch.spark._ 
+import org.apache.spark.sql._
+
 // import spark.implicits._
 
 // For this program to run sucessfully in local mode on a macbook
@@ -40,8 +42,13 @@ object RegSort {
 
     spark.sparkContext.setLogLevel("ERROR")
 
-    val artistsAndProducts = spark.sparkContext.esRDD("artists_and_products/_doc")
+    // val artistsAndProducts = spark.sparkContext.esRDD("artists_and_products/_doc")
 
+    val sqlContext = spark.sqlContext
+    val pryphdf = sqlContext.read.format("org.elasticsearch.spark.sql").load("artists_and_products/_doc")
+    // pryphdf.printSchema()
+
+    pryphdf.groupBy("artist").sum("real").withColumnRenamed("sum(real)", "dollaramount").sort(desc("dollaramount")).show()
     // val logData = spark.read.textFile(logFile).cache()
     // val numAs = logData.filter(line => line.contains("a")).count()
     // val numBs = logData.filter(line => line.contains("b")).count()
@@ -49,6 +56,19 @@ object RegSort {
     artistsAndProducts.filter(onlyCreations).take(2)
     artistsAndProducts.filter(onlyCreations).first._2("real").getClass
     artistsAndProducts.filter(onlyCreations).reduce(maxRealized)
+
+
+
+
+  val reader = spark.read
+    .format("org.elasticsearch.spark.sql")
+    // .option("es.nodes.wan.only","true")
+    // .option("es.port","443")
+    // .option("es.net.ssl","true")
+    // .option("es.nodes", esURL)
+
+  val df = reader.load("index/dogs").na.drop.orderBy($"breed")
+  display(df)
     spark.stop()
   }
 }
