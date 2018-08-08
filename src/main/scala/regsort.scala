@@ -49,6 +49,11 @@ object RegSort {
     // pryphdf.printSchema()
 
     pryphdf.groupBy("artist").sum("real").withColumnRenamed("sum(real)", "dollaramount").sort(desc("dollaramount")).show()
+
+    pryphdf.groupBy("artist").agg(sum("real"),max("real"),min("real")).sort(desc("sum(real)"))
+
+
+
     // val logData = spark.read.textFile(logFile).cache()
     // val numAs = logData.filter(line => line.contains("a")).count()
     // val numBs = logData.filter(line => line.contains("b")).count()
