@@ -1,6 +1,8 @@
 
 package metrics
 
+import java.time._
+
 import org.apache.hadoop.metrics2.annotation.Metrics
 import org.apache.spark.sql._
 import org.apache.spark.sql.expressions.UserDefinedAggregateFunction
@@ -26,8 +28,11 @@ class RegSlope extends UserDefinedAggregateFunction {
   override def bufferSchema : StructType =
     StructType(
       Array(
-        StructField("count", LongType) ,
-        StructField("sum", DoubleType)))
+        StructField("sumx", DoubleType) ,
+        StructField("sumy", DoubleType),
+        StructField("sumxy", DoubleType),
+        StructField("sumx2", DoubleType)
+      ))
 
   // This is the output type of your aggregatation function.
   override def dataType: DataType = DoubleType
@@ -37,24 +42,27 @@ class RegSlope extends UserDefinedAggregateFunction {
 
   // This is the initial value for your buffer schema.
     override def initialize(buffer: MutableAggregationBuffer): Unit = {
-    buffer(0) = 0L
+    buffer(0) = 0.0
     buffer(1) = 1.0
   }
 
   // This is how to update your buffer schema given an input.
   override def update(buffer: MutableAggregationBuffer, input: Row): Unit = {
-    buffer(0) = buffer.getAs[Long](0) + 1
+    buffer(0) = buffer.getAs[Double](0) + 1
     buffer(1) = buffer.getAs[Double](1) + input.getAs[Long](0)
   }
 
   // This is how to merge two objects with the bufferSchema type.
   override def merge(buffer1: MutableAggregationBuffer, buffer2: Row): Unit = {
-    buffer1(0) = buffer1.getAs[Long](0) + buffer2.getAs[Long](0)
+    buffer1(0) = buffer1.getAs[Double](0) + buffer2.getAs[Double](0)
     buffer1(1) = buffer1.getAs[Double](1) + buffer2.getAs[Double](1)
   }
 
   // This is where you output the final value, given the final value of your bufferSchema.
   override def evaluate(buffer: Row): Any = {
+
+    val fixedClock = Clock.fixed(Instant.ofEpochSecond(1234567890L), ZoneOffset.ofHours(0))
+
     buffer.getDouble(1)
   }
 
