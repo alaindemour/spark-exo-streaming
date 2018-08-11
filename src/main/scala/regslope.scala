@@ -55,7 +55,9 @@ class RegSlope extends UserDefinedAggregateFunction {
   // This is the initial value for your buffer schema.
     override def initialize(buffer: MutableAggregationBuffer): Unit = {
     buffer(0) = 0.0
-    buffer(1) = 1.0
+    buffer(1) = 0.0
+    buffer(2) = 0.0
+    buffer(3) = 0.0
   }
 
   // This is how to update your buffer schema given an input.
