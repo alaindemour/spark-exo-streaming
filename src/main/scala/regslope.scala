@@ -3,6 +3,7 @@ package metrics
 
 import java.time._
 
+
 import org.apache.hadoop.metrics2.annotation.Metrics
 import org.apache.spark.sql._
 import org.apache.spark.sql.expressions.UserDefinedAggregateFunction
@@ -19,10 +20,21 @@ import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 class RegSlope extends UserDefinedAggregateFunction {
   // Input Data Type Schema
+
+  val t0 = LocalDate.of(2000,1,1)
+
+  def xtime(y : Long ,m : Long): Long = {
+    val t = LocalDate.of(y.toInt ,m.toInt ,1)
+    val timecoord = t0.until(t)
+    timecoord.toTotalMonths
+  }
+
+
   override def inputSchema: StructType = StructType(
     Array(
-      StructField("x", LongType, true),
-      StructField("y", LongType, true)
+      StructField("y", LongType, true),
+      StructField("m", LongType, true) ,
+      StructField("p", LongType, true)
     ))
 
   override def bufferSchema : StructType =
@@ -62,6 +74,8 @@ class RegSlope extends UserDefinedAggregateFunction {
   override def evaluate(buffer: Row): Any = {
 
     val fixedClock = Clock.fixed(Instant.ofEpochSecond(1234567890L), ZoneOffset.ofHours(0))
+
+    var i = 0L
 
     buffer.getDouble(1)
   }
