@@ -4,6 +4,8 @@ import org.apache.spark.sql.functions._
 import org.elasticsearch.spark._
 import org.apache.spark.sql._
 
+import metrics.RegSlope
+
 // import spark.implicits._
 
 // For this program to run sucessfully in local mode on a macbook
@@ -40,7 +42,17 @@ object RegSort {
     // pryphdf.groupBy("artist").sum("real").withColumnRenamed("sum(real)", "dollaramount").sort(desc("dollaramount")).show()
 
 //    pryphdf.where('real.isNotNull).groupBy("artist").agg(sum("real"),max("real"),min("real")).sort(desc("sum(real)"))
-    pryphdf.where('real.isNotNull).groupBy("artist").agg(sum("real").as("dollaramount"),max("real"),min("real")).sort(desc("dollaramount")).show
+//    pryphdf.where('real.isNotNull).groupBy("artist").agg(sum("real").as("dollaramount"),max("real"),min("real")).sort(desc("dollaramount")).show
+
+    val slo = new RegSlope
+
+    pryphdf
+      .where('real.isNotNull)
+      .groupBy("artist")
+      .agg(sum("real").as("dollaramount"),max("real"),slo(col("year"),col("month")))
+          .sort(desc("dollaramount")).show
+
+
 
     spark.stop()
   }
