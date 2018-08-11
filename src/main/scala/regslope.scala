@@ -43,7 +43,8 @@ class RegSlope extends UserDefinedAggregateFunction {
         StructField("sumx", DoubleType) ,
         StructField("sumy", DoubleType),
         StructField("sumxy", DoubleType),
-        StructField("sumx2", DoubleType)
+        StructField("sumx2", DoubleType),
+        StructField("i", LongType)
       ))
 
   // This is the output type of your aggregatation function.
@@ -54,35 +55,39 @@ class RegSlope extends UserDefinedAggregateFunction {
 
   // This is the initial value for your buffer schema.
     override def initialize(buffer: MutableAggregationBuffer): Unit = {
-    buffer(0) = 0.0
-    buffer(1) = 0.0
-    buffer(2) = 0.0
-    buffer(3) = 0.0
+    buffer(0) = 0.0 // sum x
+    buffer(1) = 0.0 // sum y
+    buffer(2) = 0.0 // sum xy
+    buffer(3) = 0.0 // sum x2
+    buffer(4) = 0L // count i
   }
 
   // This is how to update your buffer schema given an input.
   override def update(buffer: MutableAggregationBuffer, input: Row): Unit = {
-    buffer(0) = buffer.getAs[Double](0) + 1
     val y = input.getAs[Long](0)
     val m = input.getAs[Long](1)
     val p = input.getAs[Long](2)
-    buffer(1) = buffer.getAs[Double](1) + xtime(y,m)
+    val x = xtime(y,m)
+    buffer(0) = buffer.getAs[Double](0) + x// sum x
+    buffer(1) = buffer.getAs[Double](1) + p // sum y
+    buffer(2) = buffer.getAs[Double](2) + x * p // sum xy
+    buffer(3) = buffer.getAs[Double](3) + x * x // sum x2
+    buffer(4) = buffer.getAs[Long](4) + 1
   }
 
   // This is how to merge two objects with the bufferSchema type.
   override def merge(buffer1: MutableAggregationBuffer, buffer2: Row): Unit = {
     buffer1(0) = buffer1.getAs[Double](0) + buffer2.getAs[Double](0)
     buffer1(1) = buffer1.getAs[Double](1) + buffer2.getAs[Double](1)
+    buffer1(2) = buffer1.getAs[Double](2) + buffer2.getAs[Double](2)
+    buffer1(3) = buffer1.getAs[Double](3) + buffer2.getAs[Double](3)
+    buffer1(4) = buffer1.getAs[Long](4) + buffer2.getAs[Long](4)
   }
 
   // This is where you output the final value, given the final value of your bufferSchema.
   override def evaluate(buffer: Row): Any = {
 
-    val fixedClock = Clock.fixed(Instant.ofEpochSecond(1234567890L), ZoneOffset.ofHours(0))
-
-    var i = 0L
-
-    buffer.getDouble(1)
+    buffer.getLong(4).toDouble
   }
 
 }
