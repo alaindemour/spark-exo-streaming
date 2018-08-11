@@ -60,7 +60,7 @@ object RegSort {
         ,slo(col("year"),col("month"),col("real")).as("slope"))
       .na
       .drop()
-      .where('cardinality > 5)
+      .where('cardinality > 10)
       .sort(desc("slope")).show
 
 
