@@ -64,7 +64,7 @@ class RegSlope extends UserDefinedAggregateFunction {
     val y = input.getAs[Long](0)
     val m = input.getAs[Long](1)
     val p = input.getAs[Long](2)
-    buffer(1) = buffer.getAs[Double](1) + input.getAs[Long](0)
+    buffer(1) = buffer.getAs[Double](1) + y
   }
 
   // This is how to merge two objects with the bufferSchema type.
