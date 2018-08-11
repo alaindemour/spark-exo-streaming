@@ -56,6 +56,8 @@ object RegSort {
         sum("real").as("dollaramount")
         ,max("real")
         ,slo(col("year"),col("month"),col("real")).as("slope"))
+      .na
+      .drop()
       .sort(desc("slope")).show
 
 
