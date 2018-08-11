@@ -61,6 +61,9 @@ class RegSlope extends UserDefinedAggregateFunction {
   // This is how to update your buffer schema given an input.
   override def update(buffer: MutableAggregationBuffer, input: Row): Unit = {
     buffer(0) = buffer.getAs[Double](0) + 1
+    val y = input.getAs[Long](0)
+    val m = input.getAs[Long](1)
+    val p = input.getAs[Long](2)
     buffer(1) = buffer.getAs[Double](1) + input.getAs[Long](0)
   }
 

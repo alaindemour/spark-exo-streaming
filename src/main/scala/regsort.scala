@@ -16,7 +16,7 @@ import metrics.RegSlope
 
 
 object RegSort {
-  
+
 
   def main(args: Array[String]) {
     // val logFile = "./test.csv" // Should be some file on your system
@@ -55,7 +55,7 @@ object RegSort {
       .agg(
         sum("real").as("dollaramount")
         ,max("real")
-        ,slo(col("year"),col("month")))
+        ,slo(col("year"),col("month"),col("real")))
       .sort(desc("dollaramount")).show
 
 
