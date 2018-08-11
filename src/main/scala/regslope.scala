@@ -86,8 +86,12 @@ class RegSlope extends UserDefinedAggregateFunction {
 
   // This is where you output the final value, given the final value of your bufferSchema.
   override def evaluate(buffer: Row): Any = {
-
-    buffer.getLong(4).toDouble
+    val sumx = buffer.getDouble(0)
+    val sumy = buffer.getDouble(1)
+    val sumxy = buffer.getDouble(2)
+    val sumx2 = buffer.getDouble(3)
+    val i = buffer.getLong(4)
+    (i * sumxy - (sumx * sumy)) / (i * sumx2 - (sumx * sumx))
   }
 
 }
