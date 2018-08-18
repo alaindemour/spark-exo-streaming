@@ -52,8 +52,8 @@ object RegSort {
     pryphdf
       .where('real.isNotNull)
       .where('death.isNull)
-      .where('x.isNotNull)
-      .where('y.isNotNull)
+//      .where('x.isNotNull)
+//      .where('y.isNotNull)
       .groupBy("artist")
       .agg(
         count("artist").as("cardinality")
@@ -62,7 +62,7 @@ object RegSort {
         ,slo(col("year"),col("month"),col("real")).as("slope"))
       .na
       .drop()
-      .where('cardinality > 20)
+      .where('cardinality > 10)
       .sort(desc("slope")).show(400 )
 
 
