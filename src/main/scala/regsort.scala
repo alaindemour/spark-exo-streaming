@@ -39,7 +39,7 @@ object RegSort {
     val sqlContext = spark.sqlContext
     import sqlContext.implicits._
 
-    val pryphdf = sqlContext.read.format("org.elasticsearch.spark.sql").load("artists_and_products/_doc")
+    val foodData = sqlContext.read.format("org.elasticsearch.spark.sql").load("artists_and_products/_doc")
     // pryphdf.printSchema()
 
     // pryphdf.groupBy("artist").sum("real").withColumnRenamed("sum(real)", "dollaramount").sort(desc("dollaramount")).show()
@@ -49,7 +49,7 @@ object RegSort {
 
     val slo = new RegSlope
 
-    pryphdf
+    foodData
       .where('real.isNotNull)
       .where('death.isNull)
 //      .where('x.isNotNull)
