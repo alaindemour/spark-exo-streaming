@@ -95,4 +95,3 @@ class RegSlope extends UserDefinedAggregateFunction {
 
 }
 
-//sqlContext.udf.register("slope", new RegSlope)

@@ -23,7 +23,6 @@ object RegSort {
     val spark = SparkSession
       .builder
       .appName("regsort")
-//      .config("es.index.auto.create", "true")
       // .config("spark.network.timeout", "600s")
       // .config("spark.executor.heartbeatInterval", "120s")
       // .config("spark.executor.memory", "2g")
@@ -33,19 +32,14 @@ object RegSort {
 
     spark.sparkContext.setLogLevel("ERROR")
 
-    // val artistsAndProducts = spark.sparkContext.esRDD("artists_and_products/_doc")
-
     val sqlContext = spark.sqlContext
     import sqlContext.implicits._
-
-    //    val foodData = sqlContext.read.format("org.elasticsearch.spark.sql").load("artists_and_products/_doc")
 
     val foodData = spark
       .read
       .option("inferSchema", "true")
       .option("header", "true")
-      .csv("./smallfood.csv")
-
+      .csv("./small-food.csv")
 
     val slo = new RegSlope
 
