@@ -1,6 +1,6 @@
 
 // runing version
-spark-submit  --class "RegSort" --jars ./lib/elasticsearch-spark-20_2.11-6.3.2.jar --master local[5] ./target/scala-2.11/regsort_2.11-1.0.jar
+spark-submit  --class "RegSort"   --master local[5] ./target/scala-2.11/regsort_2.11-1.0.jar
 
 
 // debug version
