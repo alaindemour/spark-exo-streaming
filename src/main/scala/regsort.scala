@@ -10,8 +10,8 @@ import metrics.RegSlope
 
 // import spark.implicits._
 
-// For this program to run sucessfully in local mode on a macbook
-// add the folowing to your bash profiel
+// For this program to run  in local mode on a macbook
+// you need the folowing to your bash profile so that enough memory is allocated
 // export _JAVA_OPTIONS="-Xms512m -Xmx4g"
 
 
@@ -19,12 +19,11 @@ object RegSort {
 
 
   def main(args: Array[String]) {
-    // val logFile = "./test.csv" // Should be some file on your system
 
     val spark = SparkSession
       .builder
       .appName("regsort")
-      .config("es.index.auto.create", "true")
+//      .config("es.index.auto.create", "true")
       // .config("spark.network.timeout", "600s")
       // .config("spark.executor.heartbeatInterval", "120s")
       // .config("spark.executor.memory", "2g")
@@ -39,73 +38,24 @@ object RegSort {
     val sqlContext = spark.sqlContext
     import sqlContext.implicits._
 
-    val foodData = sqlContext.read.format("org.elasticsearch.spark.sql").load("artists_and_products/_doc")
-    // pryphdf.printSchema()
+    //    val foodData = sqlContext.read.format("org.elasticsearch.spark.sql").load("artists_and_products/_doc")
 
-    // pryphdf.groupBy("artist").sum("real").withColumnRenamed("sum(real)", "dollaramount").sort(desc("dollaramount")).show()
+    val foodData = spark
+      .read
+      .option("inferSchema", "true")
+      .option("header", "true")
+      .csv("./smallfood.csv")
 
-    //    pryphdf.where('real.isNotNull).groupBy("artist").agg(sum("real"),max("real"),min("real")).sort(desc("sum(real)"))
-    //    pryphdf.where('real.isNotNull).groupBy("artist").agg(sum("real").as("dollaramount"),max("real"),min("real")).sort(desc("dollaramount")).show
 
     val slo = new RegSlope
 
     foodData
-      .where('real.isNotNull)
-      .where('death.isNull)
-//      .where('x.isNotNull)
-//      .where('y.isNotNull)
-      .groupBy("artist")
-      .agg(
-        count("artist").as("cardinality")
-        ,sum("real").as("dollaramount")
-        ,max("real")
-        ,slo(col("year"),col("month"),col("real")).as("slope"))
+      .groupBy("Area", "Item")
+      .agg(slo(col("year"), col("quantity")).as("slope"))
       .na
       .drop()
-      .where('cardinality > 10)
-      .sort(desc("slope")).show(400 )
-
-
+      .sort(desc("slope")).show(400)
 
     spark.stop()
   }
 }
-
-
-
-
-//
-//  type ElasticDoc = (String, scala.collection.Map[String,AnyRef])
-//
-//  val onlyCreations = (doc : ElasticDoc ) => {
-//    doc._2.contains("real")
-//  }
-//
-//  val maxRealized = (doc1 : ElasticDoc, doc2 : ElasticDoc) => {
-//    if (doc1._2("real").asInstanceOf[Long] > doc2._2("real").asInstanceOf[Long]){
-//      doc1
-//    }
-//    else {
-//      doc2
-//    }
-//  }
-// val logData = spark.read.textFile(logFile).cache()
-// val numAs = logData.filter(line => line.contains("a")).count()
-// val numBs = logData.filter(line => line.contains("b")).count()
-
-//    artistsAndProducts.filter(onlyCreations).take(2)
-//    artistsAndProducts.filter(onlyCreations).first._2("real").getClass
-//    artistsAndProducts.filter(onlyCreations).reduce(maxRealized)
-
-
-
-
-//    val reader = spark.read
-//      .format("org.elasticsearch.spark.sql")
-//    // .option("es.nodes.wan.only","true")
-// .option("es.port","443")
-// .option("es.net.ssl","true")
-// .option("es.nodes", esURL)
-
-//    val df = reader.load("index/dogs").na.drop.orderBy($"breed")
-//    display(df)

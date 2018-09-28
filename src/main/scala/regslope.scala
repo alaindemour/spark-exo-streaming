@@ -33,7 +33,6 @@ class RegSlope extends UserDefinedAggregateFunction {
   override def inputSchema: StructType = StructType(
     Array(
       StructField("y", LongType, true),
-      StructField("m", LongType, true) ,
       StructField("p", LongType, true)
     ))
 
@@ -65,8 +64,8 @@ class RegSlope extends UserDefinedAggregateFunction {
   // This is how to update your buffer schema given an input.
   override def update(buffer: MutableAggregationBuffer, input: Row): Unit = {
     val y = input.getAs[Long](0)
-    val m = input.getAs[Long](1)
-    val p = input.getAs[Long](2)
+    val m : Long = 2
+    val p = input.getAs[Long](1)
     val x = xtime(y,m)
     buffer(0) = buffer.getAs[Double](0) + x// sum x
     buffer(1) = buffer.getAs[Double](1) + p // sum y
