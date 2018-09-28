@@ -41,15 +41,36 @@ object RegSort {
       .option("header", "true")
       .csv("./small-food.csv")
 
+
+    val dataSchema = foodData.schema
+
+    val foodDataStreaming = spark
+      .readStream
+      .schema(dataSchema)
+      .option("maxFilesPerTirgger",1)
+      .csv("./")
+
     val slo = new RegSlope
 
-    foodData
+    val foodQuery = foodDataStreaming
       .groupBy("Area", "Item")
       .agg(slo(col("year"), col("quantity")).as("slope"))
-      .na
-      .drop()
-      .sort(desc("slope")).show(400)
+//      .na
+//      .drop()
+//      .sort(desc("slope")).show(400)
 
-    spark.stop()
+    val activityQuery = foodQuery
+      .writeStream
+      .queryName("query_activity")
+      .format("memory")
+      .outputMode("complete")
+      .start()
+    
+    activityQuery.awaitTermination()
+
+    for (i <- 1 to 5){
+      spark.sql("SELECT * FROM query_activity").show(10)
+      Thread.sleep(1000)
+    }
   }
 }
