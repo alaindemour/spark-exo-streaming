@@ -58,10 +58,9 @@ object RegSort {
 
     val foodQuery = foodDataStreaming
       .groupBy("Area", "Item")
-      .agg(max(col("year")).as("slope"))
-//      .agg(slo(col("year"), col("quantity")).as("slope"))
-    //      .na
-//      .drop()
+      .agg(slo(col("year"), col("quantity")).as("slope"))
+      .na
+      .drop()
 //      .sort(desc("slope")).show(400)
 
     val activityQuery = foodQuery
@@ -73,7 +72,7 @@ object RegSort {
 
 
 
-    for (i <- 1 to 5){
+    for (i <- 1 to 10){
       spark.sql("SELECT * FROM query_activity").show()
       Thread.sleep(1000)
     }
