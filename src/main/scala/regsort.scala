@@ -30,10 +30,13 @@ object RegSort {
       // .config("spark.driver.maxResultSize", "4g")
       .getOrCreate()
 
+    import spark.implicits._
+
+
     spark.sparkContext.setLogLevel("ERROR")
 
-    val sqlContext = spark.sqlContext
-    import sqlContext.implicits._
+//    val sqlContext = spark.sqlContext
+//    import sqlContext.implicits._
 
     val foodData = spark
       .read
@@ -47,15 +50,17 @@ object RegSort {
     val foodDataStreaming = spark
       .readStream
       .schema(dataSchema)
+      .option("header", "true")
       .option("maxFilesPerTirgger",1)
-      .csv("./")
+      .csv("./*.csv")
 
     val slo = new RegSlope
 
     val foodQuery = foodDataStreaming
       .groupBy("Area", "Item")
-      .agg(slo(col("year"), col("quantity")).as("slope"))
-//      .na
+      .agg(max(col("year")).as("slope"))
+//      .agg(slo(col("year"), col("quantity")).as("slope"))
+    //      .na
 //      .drop()
 //      .sort(desc("slope")).show(400)
 
@@ -65,12 +70,17 @@ object RegSort {
       .format("memory")
       .outputMode("complete")
       .start()
-    
-    activityQuery.awaitTermination()
+
+
 
     for (i <- 1 to 5){
-      spark.sql("SELECT * FROM query_activity").show(10)
+      spark.sql("SELECT * FROM query_activity").show()
       Thread.sleep(1000)
     }
+
+
+    activityQuery.awaitTermination()
+
+
   }
 }
