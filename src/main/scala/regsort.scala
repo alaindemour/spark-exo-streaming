@@ -61,11 +61,12 @@ object RegSort {
       .agg(slo(col("year"), col("quantity")).as("slope"))
       .na
       .drop()
+// you cannot sort a stream aggregation
 //      .sort(desc("slope")).show(400)
 
     val activityQuery = foodQuery
       .writeStream
-      .queryName("query_activity")
+      .queryName("food_result_table")
       .format("memory")
       .outputMode("complete")
       .start()
@@ -73,7 +74,7 @@ object RegSort {
 
 
     for (i <- 1 to 10){
-      spark.sql("SELECT * FROM query_activity").show()
+      spark.sql("SELECT * FROM food_result_table").show()
       Thread.sleep(1000)
     }
 
