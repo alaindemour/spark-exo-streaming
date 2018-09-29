@@ -74,7 +74,7 @@ object RegSort {
 
 
     for (i <- 1 to 10){
-      spark.sql("SELECT * FROM food_result_table").show()
+      spark.sql("SELECT Area, Item, slope FROM food_result_table ORDER BY slope DESC").show()
       Thread.sleep(1000)
     }
 
